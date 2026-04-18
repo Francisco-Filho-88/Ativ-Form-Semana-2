@@ -1,0 +1,51 @@
+name: Continuous Delivery
+
+on:
+  push:
+    branches:
+      - main
+      - semana3-cicd
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: |
+          pip install -r requirements.txt
+
+      - name: Rodar testes
+        run: |
+          pytest
+
+      - name: Gerar artefato
+        run: |
+          mkdir output
+          echo "Build concluído com sucesso" > output/build.txt
+
+      - name: Publicar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: output/build.txt
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Simular deploy
+        run: |
+          echo "Deploy realizado com sucesso"
